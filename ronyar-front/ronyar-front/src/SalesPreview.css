@@ -1,0 +1,61 @@
+:root {
+  font: 16px/1.6 Tahoma, Arial, sans-serif;
+  color: #172f29;
+  background: #f1f6f3;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1, h2, p { margin-block: 0 0.75rem; }
+h1 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+h2 { font-size: 1.2rem; }
+
+.sales-preview { max-width: 72rem; margin: auto; padding: clamp(1rem, 4vw, 3rem); }
+.sales-preview header { margin-bottom: 1.5rem; }
+.sales-preview header p, .sales-preview small { color: #456359; }
+.preview-layout, .preview-fields { display: grid; gap: 1rem; }
+.preview-layout { grid-template-columns: 2fr 3fr; align-items: start; }
+.preview-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.preview-layout section {
+  min-width: 0;
+  padding: 1.25rem;
+  background: white;
+  border: 1px solid #d6e3db;
+  border-radius: 1rem;
+}
+
+.preview-products, .preview-cart { list-style: none; margin: 1rem 0; padding: 0; }
+.preview-products li, .preview-row-heading, .preview-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.preview-products li, .preview-cart li { padding-block: 0.75rem; border-bottom: 1px solid #e2ebe5; }
+.preview-products small { display: block; }
+.preview-row-heading { margin-bottom: 0.5rem; }
+.preview-field { display: grid; gap: 0.25rem; }
+
+.sales-preview :is(input, select, button) {
+  font: inherit;
+  min-height: 2.75rem;
+  border: 1px solid #819e90;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.65rem;
+}
+.sales-preview :is(input, select) { width: 100%; color: inherit; background: white; }
+.sales-preview button { color: #164937; background: #ebf5ef; cursor: pointer; }
+.sales-preview :focus-visible { outline: 2px solid #17694d; outline-offset: 2px; }
+.preview-total { margin-block: 1rem; font-weight: bold; flex-wrap: wrap; }
+.sales-preview .preview-checkout { width: 100%; background: #195843; color: white; }
+.sales-preview button:disabled { opacity: 0.55; cursor: default; }
+.preview-error { color: #9d2424; }
+.preview-receipt { margin-block: 1rem 0; padding: 0.75rem; border-radius: 0.5rem; background: #ebf5ef; }
+
+@media (max-width: 44rem) {
+  .preview-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 25rem) {
+  .preview-fields { grid-template-columns: 1fr; }
+}
