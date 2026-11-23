@@ -1,3 +1,31 @@
 .quick-sale{display:grid;gap:14px;font-size:.9rem;line-height:1.8}.quick-sale-fields{border:0;padding:0;min-width:0;display:grid;gap:14px}.quick-sale label{display:grid;gap:5px;min-width:0}.quick-sale input,.quick-sale select{box-sizing:border-box;width:100%;min-width:0;padding:9px;border:1px solid #b4c9d2;border-radius:9px;font:inherit;background:#fff}.quick-sale-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quick-sale-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:230px;overflow:auto}.quick-sale-results button{text-align:right;display:grid;gap:3px}.quick-sale-results span{font-size:.8rem}.quick-sale-cart{display:grid;gap:8px}.quick-sale-row{display:grid;grid-template-columns:1.5fr 1fr 1.2fr auto;gap:8px;align-items:center;padding:10px;border:1px solid #d4e1e6;border-radius:10px}.quick-sale-row strong{overflow-wrap:anywhere}.quick-sale-total{position:sticky;bottom:0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px;background:#ebf3f7;border:1px solid #bed4de;border-radius:12px}.quick-sale small{color:#516a74}@media(max-width:600px){.quick-sale-settings{grid-template-columns:1fr}.quick-sale-row{grid-template-columns:1fr 1fr}.quick-sale-row>strong{grid-column:1/-1}.quick-sale-total button{width:100%}}
 
 .quick-sale-extra{border:1px solid #d4e1e6;border-radius:9px;padding:8px}.quick-sale-extra summary{cursor:pointer;font-size:.83rem}.quick-sale-extra[open]{display:grid;gap:8px}
+
+
+/* Unified sale workspace: presentation only, financial logic remains in QuickSale.tsx */
+.quick-sale-unified{--sale-accent:#166a68;--sale-ink:#17313b;--sale-line:#dce8e8;gap:18px;color:var(--sale-ink)}
+.quick-sale-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:20px 22px;border-radius:18px;background:linear-gradient(120deg,#e7f4f0,#f4f9fb 68%,#eaf0fa);border:1px solid #d5e9e5}
+.quick-sale-heading h2{margin:5px 0 4px;font-size:1.5rem;line-height:1.5;letter-spacing:-.02em}
+.quick-sale-heading p,.quick-sale-section-heading p{margin:0;color:#587079;font-size:.82rem}
+.quick-sale-eyebrow{font-size:.72rem;font-weight:700;color:var(--sale-accent);letter-spacing:.03em}
+.quick-sale-step{border:1px solid #b7dcd4;border-radius:100px;padding:5px 12px;color:#145b58;background:#fff;font-size:.76rem;white-space:nowrap}
+.quick-sale-unified .quick-sale-fields{gap:16px}
+.quick-sale-context{padding:14px;border:1px solid var(--sale-line);border-radius:14px;background:#fff}
+.quick-sale-search-panel,.quick-sale-cart-panel,.quick-sale-payment-panel{display:grid;gap:12px;padding:18px;border:1px solid var(--sale-line);border-radius:16px;background:#fff;box-shadow:0 4px 20px rgba(25,57,65,.035)}
+.quick-sale-section-heading{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.quick-sale-section-heading h3{margin:0;font-size:1rem}
+.quick-sale-number{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:10px;background:#e0f2ed;color:#155f59;font-weight:800}
+.quick-sale-unified input:focus-visible,.quick-sale-unified select:focus-visible{outline:2px solid #218c80;outline-offset:2px;border-color:#218c80}
+.quick-sale-search-panel>label>input{min-height:48px;font-size:1rem;border-radius:12px}
+.quick-sale-unified .quick-sale-results{max-height:280px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.quick-sale-unified .quick-sale-results button{padding:12px;border:1px solid #dce8e8;border-radius:12px;background:#f8fbfb;cursor:pointer}
+.quick-sale-unified .quick-sale-results button:hover{background:#e8f5f1;border-color:#94c9be}
+.quick-sale-unified .quick-sale-row{border-color:#e0e9e9;background:#fbfdfd;border-radius:12px}
+.quick-sale-unified .quick-sale-cart>.muted{text-align:center;padding:28px 12px;border:1px dashed #c5d8d7;border-radius:12px}
+.quick-sale-unified .quick-sale-total{z-index:2;border-color:#bddbd4;background:#e8f5f0;border-radius:16px;box-shadow:0 6px 24px rgba(24,82,75,.09)}
+.quick-sale-total-amount{display:grid;gap:3px}
+.quick-sale-total-amount span{font-size:.78rem;color:#4b6b68}
+.quick-sale-total-amount strong{font-size:1.22rem;color:#134c47;overflow-wrap:anywhere}
+.quick-sale-unified .quick-sale-total .primary{min-height:46px;padding-inline:20px}
+@media(max-width:600px){.quick-sale-heading{padding:15px;flex-direction:column}.quick-sale-heading h2{font-size:1.2rem}.quick-sale-search-panel,.quick-sale-cart-panel,.quick-sale-payment-panel{padding:12px}.quick-sale-unified .quick-sale-results{grid-template-columns:1fr}.quick-sale-unified .quick-sale-total{position:sticky;bottom:0}.quick-sale-unified .quick-sale-total .primary{width:100%}}
