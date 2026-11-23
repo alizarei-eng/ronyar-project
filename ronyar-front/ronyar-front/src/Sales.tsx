@@ -1,6 +1,7 @@
 import { formatStoreMoney, storeMoneyUnit } from "./storeMoney";
 import type { AssistantRequest } from "./assistantRouting";
 import QuickSale from "./QuickSale";
+import "./Sales.css";
 import SaleAssistant from "./SaleAssistant";
 import type { SaleSuggestion } from "./api";
 import { useStoreCan } from "./StorePermissions";
@@ -19,6 +20,7 @@ export default function Sales({ initialCreate,onCreateConsumed,business, onSessi
   useEffect(()=>{if(assistantRequest){setAssistantText(assistantRequest.text);setAssistant(true);onAssistantConsumed?.();}},[assistantRequest?.id]);
   const can = useStoreCan();
   const mayManage = can("sales.manage");
+  const mayQuickSale = mayManage && can("sales.post");
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null), [draft, setDraft] = useState<SaleDetails | null>(null), [editLoading, setEditLoading] = useState(false);
   const [cancelling, setCancelling] = useState<SaleSummary | null>(null);
@@ -29,20 +31,48 @@ export default function Sales({ initialCreate,onCreateConsumed,business, onSessi
   useEffect(() => { const controller = new AbortController(); setResult(null); setError(""); setLoading(true); listSales(business.id, status, page, controller.signal).then(value => { if (!controller.signal.aborted) { if (value.totalPages > 0 && page > value.totalPages) setPage(value.totalPages); else setResult(value); } }).catch(cause => { if (!controller.signal.aborted) { setError(errorText(cause)); if (cause instanceof ApiError && cause.status === 401) onSessionExpired(); } }).finally(() => { if (!controller.signal.aborted) setLoading(false); }); return () => controller.abort(); }, [business.id, status, page, retry]);
   useEffect(() => { if (!editId) return; const controller = new AbortController(); setDraft(null); setEditLoading(true); setError(""); getSale(business.id, editId, controller.signal).then(value => { if (!controller.signal.aborted) { if (value.status !== "DRAFT") { setError("فقط پیش‌نویس قابل ویرایش است."); setEditId(null); } else setDraft(value); } }).catch(cause => { if (!controller.signal.aborted) { setError(errorText(cause)); setEditId(null); if (cause instanceof ApiError && cause.status === 401) onSessionExpired(); } }).finally(() => { if (!controller.signal.aborted) setEditLoading(false); }); return () => controller.abort(); }, [business.id, editId]);
   const controlsBusy = quick || assistant || creating || editId !== null || cancelling !== null || detailsId !== null;
+  function startInvoice() {
+    if (!mayManage) return;
+    setSuccess("");
+    setSuggestion(null);
+    setCreating(true);
+  }
+
   return <section className="sales-section">
     {editLoading && editId && !draft && <p role="status">در حال دریافت پیش‌نویس…</p>}
     {success && <div className="notice success" role="status">{success}</div>}
     {error && <div className="notice error" role="alert">{error}<button className="text-button" onClick={() => setRetry(value => value + 1)}>تلاش دوباره</button></div>}
-    {mayManage && <div className="sale-assistant-entry"><button type="button" className="secondary" disabled={controlsBusy} onClick={()=>{setSuccess("");setAssistantText("");setAssistant(true);}}>دستیار فروشگاه · فروش با پیام</button><p>پیام را به پیشنهاد قابل بررسی تبدیل کنید.</p></div>}
     {mayManage && assistant && <SaleAssistant initialText={assistantText} onRedirect={onAssistantRedirect} onCreated={id=>{setAssistant(false);setDetailsId(id);setSuccess("پیش‌نویس دستیار ذخیره شد؛ برای ثبت قطعی آن را بررسی کنید.");setRetry(n=>n+1);}} business={business} onClose={()=>setAssistant(false)} onSessionExpired={onSessionExpired} onUse={value=>{setSuggestion(value);setAssistant(false);setCreating(true);}} />}
-    {mayManage && can("sales.post") && <div className="sale-workspace-entry" dir="rtl"><div><span className="sale-workspace-kicker">ثبت فروش یکپارچه</span><h2>فروش جدید را از همین‌جا شروع کنید</h2><p>جستجوی کالا، سبد خرید و تسویه در یک صفحه؛ بدون جابه‌جایی بین فرم‌ها.</p></div><button type="button" className="primary" disabled={controlsBusy} onClick={()=>setQuick(true)}>شروع ثبت فروش</button></div>}
-    {quick && mayManage && can("sales.post") && <QuickSale business={business} onSessionExpired={onSessionExpired} onClose={()=>{setQuick(false);setRetry(n=>n+1);}} onView={id=>{setQuick(false);setDetailsId(id);setRetry(n=>n+1);}}/>}
+    {quick && mayQuickSale && <QuickSale business={business} onSessionExpired={onSessionExpired} onClose={()=>{setQuick(false);setRetry(n=>n+1);}} onView={id=>{setQuick(false);setDetailsId(id);setRetry(n=>n+1);}}/>}
     <DocumentListView business={business} kind="sales" storeName={business.name} currency={business.baseCurrency}
     result={result} status={status} currentPage={page} loading={loading} busy={controlsBusy}
     canCreate={mayManage} canEdit={mayManage}
+    createActions={mayManage && <section className="sale-start" aria-labelledby="sale-start-title">
+      <div className="sale-start-heading">
+        <span className="sale-start-icon" aria-hidden="true">+</span>
+        <div>
+          <h2 id="sale-start-title">ثبت فروش جدید</h2>
+          <p>روش ثبت فروش را انتخاب کنید.</p>
+        </div>
+      </div>
+      <div className="sale-start-actions">
+        {mayQuickSale && <button type="button" className="sale-start-action sale-start-primary" disabled={controlsBusy} onClick={() => setQuick(true)}>
+          <strong>ثبت فروش یکپارچه</strong>
+          <span>جستجوی کالا با نام یا بارکد، سبد خرید و تسویه در یک صفحه.</span>
+        </button>}
+        <button type="button" className={mayQuickSale ? "sale-start-action" : "sale-start-action sale-start-primary"} disabled={controlsBusy} onClick={startInvoice}>
+          <strong>ایجاد فاکتور فروش</strong>
+          <span>مشتری و اقلام را وارد کنید و پیش‌نویس بسازید.</span>
+        </button>
+        <button type="button" className="sale-start-action" disabled={controlsBusy} onClick={() => { setSuccess(""); setAssistantText(""); setAssistant(true); }}>
+          <strong>فروش با پیام</strong>
+          <span>شرح فروش را بنویسید و پیشنهاد دستیار را بررسی کنید.</span>
+        </button>
+      </div>
+    </section>}
     onStatusChange={value => { setStatus(value); setPage(1); }} onPageChange={setPage}
     onRefresh={() => setRetry(value => value + 1)}
-    onCreate={() => { if (!mayManage) return; setSuccess(""); setSuggestion(null); setCreating(true); }}
+    onCreate={startInvoice}
     onDetails={setDetailsId} onEdit={id => { if (!mayManage) return; setSuccess(""); setEditId(id); }}
     onCancelDraft={id => { if (!mayManage) return; const target = result?.items.find(item => item.id === id); if (target) { setSuccess(""); setCancelling(target); } }} />
     {mayManage && (creating || draft) && <SaleForm key={draft?.id ?? "new"} business={business} sale={draft} suggestion={creating ? suggestion : null} onSessionExpired={onSessionExpired} onSaved={sale => { setCreating(false); setSuggestion(null); setEditId(null); setDraft(null); setSuccess(`پیش‌نویس با مبلغ ${formatStoreMoney(business, sale.total)} ذخیره شد.`); setPage(1); setStatus("DRAFT"); setRetry(value => value + 1); }} onCancel={() => { setCreating(false); setSuggestion(null); setEditId(null); setDraft(null); setRetry(value => value + 1); }} />}

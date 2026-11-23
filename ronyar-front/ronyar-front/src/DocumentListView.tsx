@@ -1,6 +1,7 @@
 import type { Business } from "./api";
 import { formatStoreMoney, storeMoneyUnit } from "./storeMoney";
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import type { SaleStatus } from "./api";
 import { formatDecimal } from "./api";
 import { jalaliText } from "./jalaliDate";
@@ -32,6 +33,7 @@ type Props = {
   onStatusChange: (status: SaleStatus | "ALL") => void;
   onPageChange: (page: number) => void;
   onRefresh: () => void;
+  createActions?: ReactNode;
   canCreate: boolean;
   canEdit: boolean;
   onCreate: () => void;
@@ -85,7 +87,7 @@ function compareMoney(a: string, b: string): number {
 const statusLabel = (status: SaleStatus) => statuses.find(item => item.value === status)?.label ?? status;
 const counterpart = (item: DocumentRow) => item.party?.name || item.reason || "—";
 
-export default function DocumentListView({ business, kind, storeName, currency, result, status, currentPage, loading, busy, onStatusChange, onPageChange, onRefresh, canCreate, canEdit, onCreate, onDetails, onEdit, onCancelDraft }: Props) {
+export default function DocumentListView({ business, kind, storeName, currency, result, status, currentPage, loading, busy, onStatusChange, onPageChange, onRefresh, createActions, canCreate, canEdit, onCreate, onDetails, onEdit, onCancelDraft }: Props) {
   const details = config[kind];
   const [query, setQuery] = useState("");
   const [order, setOrder] = useState("newest");
@@ -121,8 +123,10 @@ export default function DocumentListView({ business, kind, storeName, currency, 
   return <section className="document-list" aria-label={details.heading}>
     <header className="doc-page-head">
       <div className="doc-page-titles"><p className="doc-breadcrumb">{storeName} <span aria-hidden="true">/</span> مدیریت اسناد</p><h1>{details.heading}</h1><p>{details.subtitle}</p></div>
-      {canCreate && <button type="button" className="primary doc-new-button" disabled={busy} onClick={onCreate}><span aria-hidden="true">＋</span>{details.action}</button>}
+      {canCreate && !createActions && <button type="button" className="primary doc-new-button" disabled={busy} onClick={onCreate}><span aria-hidden="true">＋</span>{details.action}</button>}
     </header>
+
+    {createActions}
 
     <div className="doc-overview" aria-label="آمار فهرست">
       <article className="doc-kpi"><span>تعداد کل در فیلتر انتخابی</span><strong>{result ? formatDecimal(String(result.total)) : "—"}</strong><small>در همه صفحات این وضعیت</small></article>
